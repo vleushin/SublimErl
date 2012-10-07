@@ -155,8 +155,13 @@ class SublimErlCompletions(SublimErlProjectLoader):
 				os.chdir(SUBLIMERL.completions_path)
 				# start gen
 				this.execute_os_command("python sublimerl_libparser.py %s %s" % (this.shellquote(SUBLIMERL.erlang_libs_path), this.shellquote(dest_file_base)))
+				completions_filename = "%s.sublime-completions" % dest_file_base
+				completions_full_filename = "%s.sublime-completions.full" % dest_file_base
+				# remove existing .full file if it exists
+				if os.path.isfile(completions_full_filename):
+					os.remove(completions_full_filename)
 				# rename file to .full
-				os.rename("%s.sublime-completions" % dest_file_base, "%s.sublime-completions.full" % dest_file_base)
+				os.rename(completions_filename, completions_full_filename)
 				# save dir information
 				f = open(dirinfo_path, 'wb')
 				pickle.dump(current_erlang_libs, f)
@@ -202,7 +207,7 @@ class SublimErlCompletionsListener(sublime_plugin.EventListener):
 	def on_post_save(self, view):
 		# ensure context matches
 		caret = view.sel()[0].a
-		if not ('source.erlang' in view.scope_name(caret) and sublime.platform() != 'windows'): return
+		if not ('source.erlang' in view.scope_name(caret)): return
 		# init
 		completions = SublimErlCompletions(view)
 		# compile saved file & reload completions
@@ -218,7 +223,7 @@ class SublimErlCompletionsListener(sublime_plugin.EventListener):
 	def on_load(self, view):
 		# only trigger within erlang
 		caret = view.sel()[0].a
-		if not ('source.erlang' in view.scope_name(caret) and sublime.platform() != 'windows'): return
+		if not ('source.erlang' in view.scope_name(caret)): return
 		# init
 		completions = SublimErlCompletions(view)
 		# get completions
