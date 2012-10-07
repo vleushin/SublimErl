@@ -1,0 +1,67 @@
+{
+	"cmd": ["rebar", "compile"],
+	"windows":
+	{
+		"cmd": ["rebar.cmd", "compile"]
+	},
+	"working_dir": "${project_path}",
+	"variants":
+	[
+		{
+			"name": "compile",
+			"cmd": ["rebar", "compile"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "compile"]
+			}
+		},
+		{
+			"name": "get-deps",
+			"cmd": ["rebar", "get-deps"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "get-deps"]
+			}
+		},
+		{
+			"name": "clean",
+			"cmd": ["rebar", "clean"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "clean"]
+			}
+		},
+		{
+			"name": "delete-deps",
+			"cmd": ["rebar", "delete-deps"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "delete-deps"]
+			}
+		},
+		{
+			"name": "test",
+			"cmd": ["rebar", "skip_deps=true", "eunit"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "skip_deps=true", "eunit"]
+			}
+		},
+		{
+			"name": "doc",
+			"cmd": ["rebar", "skip_deps=true", "doc"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "skip_deps=true", "doc"]
+			}
+		},
+		{
+			"name": "delete-deps clean get-deps compile",
+			"cmd": ["rebar", "delete-deps", "clean", "get-deps", "compile"],
+			"windows":
+			{
+				"cmd": ["rebar.cmd", "delete-deps", "clean", "get-deps", "compile"]
+			}
+		}
+	]
+}
