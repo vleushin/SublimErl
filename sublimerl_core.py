@@ -142,8 +142,9 @@ class SublimErlGlobal():
 			return m.group(1)
 
 	def get_exe_path(self, name):
-		retcode, data = self.execute_os_command('which %s' % name)
-		data = data.strip()
+		command = 'where' if sublime.platform() == 'windows' else 'which'
+		retcode, data = self.execute_os_command('%s %s' % (command, name))
+		data = data.split('\n')[0].strip()
 		if retcode == 0 and len(data) > 0:
 			return data
 
@@ -161,10 +162,10 @@ class SublimErlGlobal():
 		stdout, stderr = p.communicate()
 		return (p.returncode, stdout)
 
-
 	def shellquote(self, s):
-		return "'" + s.replace("'", "'\\''") + "'"
-
+		if s:
+			quote = "\"" if sublime.platform() == 'windows' else "'"
+			return quote + s.replace("'", "'\\''") + quote
 
 # initialize
 SUBLIMERL = SublimErlGlobal()
@@ -221,11 +222,12 @@ class SublimErlProjectLoader():
 
 	def set_app_name(self):
 		# get app file
-		src_path = os.path.join(self.test_root, 'src')
-		for f in os.listdir(src_path):
-			if f.endswith('.app.src'):
-				app_file_path = os.path.join(src_path, f)
-				self.app_name = self.find_app_name(app_file_path)
+		if self.project_root:
+			src_path = os.path.join(self.project_root, 'src')
+			for f in os.listdir(src_path):
+				if f.endswith('.app.src'):
+					app_file_path = os.path.join(src_path, f)
+					self.app_name = self.find_app_name(app_file_path)
 
 	def find_app_name(self, app_file_path):
 		f = open(app_file_path, 'rb')
@@ -268,6 +270,9 @@ class SublimErlProjectLoader():
 
 		# start proc
 		current_env = self.get_test_env()
+		# TODO windows hack
+		if sublime.platform() == 'windows':
+			current_env = {}
 		p = subprocess.Popen(os_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=current_env)
 		if block == True:
 			stdout, stderr = p.communicate()
@@ -287,9 +292,9 @@ class SublimErlTextCommand(sublime_plugin.TextCommand):
 		if self._context_match(): return self.run_command(edit)
 
 	def _context_match(self):
-		# context matches if lang is source.erlang and if platform is not windows
+		# context matches if lang is source.erlang
 		caret = self.view.sel()[0].a
-		if 'source.erlang' in self.view.scope_name(caret) and sublime.platform() != 'windows': return True
+		if 'source.erlang' in self.view.scope_name(caret): return True
 		else: return False
 
 	def is_enabled(self):

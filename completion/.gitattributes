@@ -1,0 +1,3 @@
+# Treat pickle files as binary (otherwise can cause GIT+CRLF issues on Windows)
+*.dirinfo -text
+*.disasm -text
